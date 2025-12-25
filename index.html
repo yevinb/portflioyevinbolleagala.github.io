@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yevin Bollegala | Web & AI Architect | Full-Stack Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #facc15;
+            --primary-dark: #e6b800;
+            --accent: #4facfe;
+            --accent-dark: #3a8fd6;
+            --bg: #05070a;
+            --bg-light: #0f1319;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --wa-green: #25D366;
+        }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            opacity: 0.3;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-heavy {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .page {
+            display: none;
+            animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.1) 0%, rgba(79, 172, 254, 0.1) 100%);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .slider-track {
+            height: 4px;
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            position: relative;
+            margin-top: 12px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .slider-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            position: absolute;
+            border-radius: 2px;
+        }
+        
+        .slider-thumb {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px var(--primary);
+        }
+        
+        .cat-btn {
+            border: 1px solid rgba(250, 204, 21, 0.4);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .cat-btn.active {
+            background: var(--primary);
+            color: #000;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+        }
+        
+        .cat-btn:hover:not(.active) {
+            background: rgba(250, 204, 21, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .project-card {
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0) 0%, rgba(79, 172, 254, 0) 100%);
+            z-index: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .project-card:hover::before {
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.03) 0%, rgba(79, 172, 254, 0.03) 100%);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(250, 204, 21, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tech-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 17px;
+            width: 2px;
+            height: calc(100% + 25px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .stat-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .mobile-menu {
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .form-success {
+            display: none;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .form-error {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 px-6 md:px-10 py-5 flex justify-between items-center glass border-b border-white/5">
+        <div class="flex items-center gap-3 group cursor-pointer" onclick="showPage('home')">
+            <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center font-bold text-black text-sm shadow-lg shadow-yellow-500/20">YB</div>
+            <div>
+                <span class="font-extrabold tracking-tighter text-xl group-hover:text-yellow-400 transition uppercase">Yevin Bollegala</span>
+                <div class="text-[10px] text-gray-500 mono uppercase tracking-widest mt-1">Web & AI Architect</div>
+            </div>
+        </div>
+        
+        <div class="hidden md:flex space-x-10 text-[12px] font-bold uppercase tracking-[0.15em]">
+            <a onclick="showPage('home')" class="nav-link">Home</a>
+            <a onclick="showPage('about')" class="nav-link">About</a>
+            <a onclick="showPage('expertise')" class="nav-link">Expertise</a>
+            <a onclick="showPage('projects')" class="nav-link">Projects</a>
+            <a onclick="showPage('testimonials')" class="nav-link">Testimonials</a>
+            <a onclick="showPage('contact')" class="nav-link">Contact</a>
+        </div>
+        
+        <button id="mobile-menu-btn" class="md:hidden text-gray-400 hover:text-yellow-500 transition">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 w-full h-0 bg-black/95 backdrop-blur-lg z-40 overflow-hidden">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex justify-between items-center mb-12">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center font-bold text-black text-sm">YB</div>
+                    <span class="font-extrabold tracking-tighter text-xl">Yevin Bollegala</span>
+                </div>
+                <button id="close-mobile-menu" class="text-gray-400 hover:text-yellow-500 transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="flex flex-col space-y-8 text-center">
+                <a onclick="showPage('home'); closeMobileMenu()" class="text-2xl font-bold hover:text-yellow-500 transition py-3">Home</a>
+                <a onclick="showPage('about'); closeMobileMenu()" class="text-2xl font-bold hover:text-yellow-500 transition py-3">About</a>
+                <a onclick="showPage('expertise'); closeMobileMenu()" class="text-2xl font-bold hover:text-yellow-500 transition py-3">Expertise</a>
+                <a onclick="showPage('projects'); closeMobileMenu()" class="text-2xl font-bold hover:text-yellow-500 transition py-3">Projects</a>
+                <a onclick="showPage('testimonials'); closeMobileMenu()" class="text-2xl font-bold hover:text-yellow-500 transition py-3">Testimonials</a>
+                <a onclick="showPage('contact'); closeMobileMenu()" class="text-2xl font-bold hover:text-yellow-500 transition py-3">Contact</a>
+            </div>
+            
+            <div class="absolute bottom-10 left-0 right-0 text-center text-gray-500 text-sm">
+                © 2023 Yevin Bollegala. All rights reserved.
+            </div>
+        </div>
+    </div>
+
+    <!-- Home Page -->
+    <main id="home" class="page active pt-32 px-6 max-w-7xl mx-auto pb-20">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-16">
+            <div class="lg:w-1/2">
+                <div class="mb-8">
+                    <span class="text-yellow-500 font-mono text-sm mb-4 tracking-[0.3em] uppercase">United Kingdom // Remote Specialist</span>
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-8 leading-tight">
+                        Building <span class="gradient-text">Intelligent</span> Digital Solutions
+                    </h1>
+                    <p class="text-xl text-gray-400 max-w-3xl leading-relaxed mb-12">
+                        I specialize in creating secure, scalable web applications with AI-powered functionality. With over 30+ projects delivered, I transform complex requirements into elegant, high-performance digital experiences.
+                    </p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-6 mb-16">
+                    <button onclick="showPage('projects')" class="px-10 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold rounded-lg hover:shadow-xl hover:shadow-yellow-500/20 transition-all duration-300">
+                        View My Work
+                    </button>
+                    <button onclick="showPage('contact')" class="px-10 py-4 glass border border-yellow-500/30 text-yellow-500 font-bold rounded-lg hover:bg-yellow-500/10 transition-all duration-300">
+                        Get In Touch
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-yellow-500 mb-2">30+</div>
+                        <div class="text-sm text-gray-500 uppercase tracking-widest">Projects</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-yellow-500 mb-2">100%</div>
+                        <div class="text-sm text-gray-500 uppercase tracking-widest">Satisfaction</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-yellow-500 mb-2">24/7</div>
+                        <div class="text-sm text-gray-500 uppercase tracking-widest">Support</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:w-1/2 relative">
+                <div class="glass-heavy rounded-3xl p-2 relative overflow-hidden">
+                    <div class="gradient-bg rounded-2xl p-10">
+                        <div class="text-center mb-10">
+                            <div class="w-40 h-40 rounded-full bg-gradient-to-br from-yellow-400/20 to-blue-500/20 mx-auto flex items-center justify-center mb-6">
+                                <div class="w-32 h-32 rounded-full bg-gradient-to-br from-yellow-400 to-blue-500 flex items-center justify-center text-5xl font-bold">
+                                    <span class="text-black">YB</span>
+                                </div>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-2">Yevin Bollegala</h3>
+                            <p class="text-gray-400 mb-6">Web & AI Architect</p>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-black/30 flex items-center justify-center">
+                                    <i class="fas fa-map-marker-alt text-yellow-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">Location</div>
+                                    <div class="font-bold">United Kingdom (Remote)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-black/30 flex items-center justify-center">
+                                    <i class="fas fa-briefcase text-yellow-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">Availability</div>
+                                    <div class="font-bold">Taking New Projects</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-black/30 flex items-center justify-center">
+                                    <i class="fas fa-clock text-yellow-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500">Response Time</div>
+                                    <div class="font-bold">Within 24 Hours</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Floating Elements -->
+                <div class="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-yellow-500/10 blur-xl"></div>
+                <div class="absolute -bottom-6 -left-6 w-32 h-32 rounded-full bg-blue-500/10 blur-xl"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- About Page -->
+    <main id="about" class="page pt-40 px-6 max-w-6xl mx-auto pb-20">
+        <div class="mb-20">
+            <h2 class="text-5xl font-black mb-6 tracking-tighter">About <span class="gradient-text">Me</span></h2>
+            <p class="text-xl text-gray-400 max-w-4xl leading-relaxed">
+                I'm a passionate full-stack developer specializing in AI integration and modern web architecture. With a focus on creating intelligent, user-centric solutions, I bridge the gap between complex technology and business needs.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div>
+                <h3 class="text-3xl font-bold mb-8 section-title">My Journey</h3>
+                
+                <div class="space-y-8">
+                    <div class="timeline-item">
+                        <div class="text-yellow-500 font-bold text-sm mb-2 uppercase tracking-widest">2018 - 2020</div>
+                        <h4 class="text-xl font-bold mb-2">Frontend Development Focus</h4>
+                        <p class="text-gray-400">
+                            Started with mastering modern frontend technologies, building responsive websites and user interfaces for small to medium businesses.
+                        </p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="text-yellow-500 font-bold text-sm mb-2 uppercase tracking-widest">2020 - 2022</div>
+                        <h4 class="text-xl font-bold mb-2">Full-Stack Expansion</h4>
+                        <p class="text-gray-400">
+                            Expanded into backend development, API design, and database architecture while integrating AI capabilities into web applications.
+                        </p>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="text-yellow-500 font-bold text-sm mb-2 uppercase tracking-widest">2022 - Present</div>
+                        <h4 class="text-xl font-bold mb-2">AI Integration Specialist</h4>
+                        <p class="text-gray-400">
+                            Specializing in AI chatbot development, machine learning integration, and building scalable neural systems for enterprise clients.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="text-3xl font-bold mb-8 section-title">My Philosophy</h3>
+                
+                <div class="glass p-8 rounded-2xl mb-8">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-500/20 to-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-lightbulb text-yellow-500 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold">Innovation Through Simplicity</h4>
+                            <p class="text-gray-400 text-sm">Complex problems deserve elegant solutions</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400">
+                        I believe the most effective technology solutions are those that appear simple to the end-user while handling complexity behind the scenes. My goal is to create intuitive experiences powered by sophisticated architectures.
+                    </p>
+                </div>
+                
+                <div class="glass p-8 rounded-2xl">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-500/20 to-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-yellow-500 text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-bold">Security First Approach</h4>
+                            <p class="text-gray-400 text-sm">Building with protection in mind</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400">
+                        Every application I develop incorporates security best practices from the ground up. From data encryption to secure authentication, I ensure your digital assets are protected against modern threats.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Expertise Page -->
+    <main id="expertise" class="page pt-40 px-6 max-w-7xl mx-auto pb-20">
+        <div class="mb-16 text-center">
+            <h2 class="text-5xl font-black mb-6 tracking-tighter">Technical <span class="gradient-text">Expertise</span></h2>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                My skill set spans from frontend aesthetics to backend architecture and AI integration
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+            <div class="glass p-8 rounded-2xl project-card">
+                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 flex items-center justify-center mb-6">
+                    <i class="fas fa-robot text-yellow-500 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">AI Chatbot Integration</h3>
+                <p class="text-gray-400 mb-6">
+                    Building intelligent conversational interfaces using ChatGPT-like logic, natural language processing, and custom training datasets.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tech-tag">OpenAI API</span>
+                    <span class="tech-tag">NLP</span>
+                    <span class="tech-tag">Dialogflow</span>
+                </div>
+            </div>
+            
+            <div class="glass p-8 rounded-2xl project-card">
+                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 flex items-center justify-center mb-6">
+                    <i class="fab fa-vuejs text-blue-500 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Vue.js Development</h3>
+                <p class="text-gray-400 mb-6">
+                    Creating reactive, performant applications with Vue.js, Vuex, Vue Router, and modern TypeScript implementations.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tech-tag">Vue 3</span>
+                    <span class="tech-tag">TypeScript</span>
+                    <span class="tech-tag">Vuex/Pinia</span>
+                </div>
+            </div>
+            
+            <div class="glass p-8 rounded-2xl project-card">
+                <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/5 flex items-center justify-center mb-6">
+                    <i class="fas fa-server text-green-500 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Backend & APIs</h3>
+                <p class="text-gray-400 mb-6">
+                    Designing scalable server architectures, RESTful APIs, real-time systems, and secure data management solutions.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag">Express</span>
+                    <span class="tech-tag">GraphQL</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-12">
+            <h3 class="text-3xl font-bold mb-10 section-title">Proficiency Levels</h3>
+            
+            <div class="space-y-10">
+                <div class="group">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xl font-bold">AI Integration & Chatbots</span>
+                        <span class="text-yellow-500 font-mono text-sm font-bold">95%</span>
+                    </div>
+                    <div class="slider-track">
+                        <div class="slider-fill" style="width: 95%"></div>
+                        <div class="slider-thumb" style="left: 95%"></div>
+                    </div>
+                </div>
+                
+                <div class="group">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xl font-bold">Full-Stack Vue.js Development</span>
+                        <span class="text-yellow-500 font-mono text-sm font-bold">92%</span>
+                    </div>
+                    <div class="slider-track">
+                        <div class="slider-fill" style="width: 92%"></div>
+                        <div class="slider-thumb" style="left: 92%"></div>
+                    </div>
+                </div>
+                
+                <div class="group">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xl font-bold">Backend Architecture & APIs</span>
+                        <span class="text-yellow-500 font-mono text-sm font-bold">88%</span>
+                    </div>
+                    <div class="slider-track">
+                        <div class="slider-fill" style="width: 88%"></div>
+                        <div class="slider-thumb" style="left: 88%"></div>
+                    </div>
+                </div>
+                
+                <div class="group">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xl font-bold">Security & Performance Optimization</span>
+                        <span class="text-yellow-500 font-mono text-sm font-bold">90%</span>
+                    </div>
+                    <div class="slider-track">
+                        <div class="slider-fill" style="width: 90%"></div>
+                        <div class="slider-thumb" style="left: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Projects Page -->
+    <main id="projects" class="page pt-40 px-6 max-w-7xl mx-auto pb-20">
+        <div class="mb-16">
+            <h2 class="text-5xl font-black mb-6 tracking-tighter">Project <span class="gradient-text">Portfolio</span></h2>
+            <p class="text-xl text-gray-400 max-w-3xl">
+                Explore my diverse portfolio of web applications, AI integrations, and business solutions
+            </p>
+        </div>
+        
+        <div class="flex flex-wrap gap-4 mb-12">
+            <button class="cat-btn active" data-filter="all">All Projects</button>
+            <button class="cat-btn" data-filter="ai">AI & Chatbots</button>
+            <button class="cat-btn" data-filter="web">Web Applications</button>
+            <button class="cat-btn" data-filter="ecommerce">E-Commerce</button>
+            <button class="cat-btn" data-filter="education">Education</button>
+            <button class="cat-btn" data-filter="business">Business</button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="project-list">
+            <!-- Projects will be dynamically loaded here -->
+        </div>
+        
+        <div class="text-center mt-16">
+            <button onclick="loadMoreProjects()" class="px-10 py-4 glass border border-yellow-500/30 text-yellow-500 font-bold rounded-lg hover:bg-yellow-500/10 transition-all duration-300">
+                Load More Projects
+            </button>
+        </div>
+    </main>
+
+    <!-- Testimonials Page -->
+    <main id="testimonials" class="page pt-40 px-6 max-w-6xl mx-auto pb-20">
+        <div class="mb-16 text-center">
+            <h2 class="text-5xl font-black mb-6 tracking-tighter">Client <span class="gradient-text">Testimonials</span></h2>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                Feedback from businesses and individuals I've worked with
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="glass p-8 rounded-2xl">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                        JS
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold">Hasnain Abdullah</h4>
+                        <p class="text-gray-400 text-sm">CEO, Tech Innovations Ltd</p>
+                    </div>
+                </div>
+                <p class="text-gray-400 italic mb-6">
+                    "Yevin transformed our customer service with an AI chatbot that reduced response times by 80%. His technical expertise and attention to detail are exceptional."
+                </p>
+                <div class="flex text-yellow-500">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            
+            <div class="glass p-8 rounded-2xl">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                        SA
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold">Rajat Verma</h4>
+                        <p class="text-gray-400 text-sm">Director, Alhidaayah Academy</p>
+                    </div>
+                </div>
+                <p class="text-gray-400 italic mb-6">
+                    "The online learning platform Yevin built for us has been transformative. The AI tutoring feature has significantly improved student engagement and outcomes."
+                </p>
+                <div class="flex text-yellow-500">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            
+            <div class="glass p-8 rounded-2xl">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                        MR
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold">Mohisin Khan</h4>
+                        <p class="text-gray-400 text-sm">Marketing Director, Real Impact</p>
+                    </div>
+                </div>
+                <p class="text-gray-400 italic mb-6">
+                    "Our new website delivered by Yevin increased lead generation by 150%. The seamless integration with our CRM and marketing automation tools is impressive."
+                </p>
+                <div class="flex text-yellow-500">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+            
+            <div class="glass p-8 rounded-2xl">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                        EL
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold">Ibrahim Ahamad</h4>
+                        <p class="text-gray-400 text-sm">Founder, Essence Lux</p>
+                    </div>
+                </div>
+                <p class="text-gray-400 italic mb-6">
+                    "The e-commerce platform Yevin developed for our perfume business is both beautiful and functional. Sales have increased by 200% since launch."
+                </p>
+                <div class="flex text-yellow-500">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Contact Page -->
+    <main id="contact" class="page pt-40 px-6 max-w-5xl mx-auto pb-20">
+        <div class="mb-16 text-center">
+            <h2 class="text-5xl font-black mb-6 tracking-tighter">Let's <span class="gradient-text">Connect</span></h2>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                Ready to transform your ideas into reality? Get in touch to discuss your next project
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div>
+                <h3 class="text-3xl font-bold mb-8 section-title">Contact Information</h3>
+                
+                <div class="space-y-8 mb-12">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 rounded-xl glass flex items-center justify-center">
+                            <i class="fas fa-envelope text-yellow-500 text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 uppercase tracking-widest mb-1">Email</div>
+                            <a href="mailto:yevin.bollegala@gmail.com" class="text-xl font-bold hover:text-yellow-500 transition">yevin.bollegala@gmail.com</a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 rounded-xl glass flex items-center justify-center">
+                            <i class="fab fa-whatsapp text-green-500 text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 uppercase tracking-widest mb-1">WhatsApp</div>
+                            <a href="https://wa.me/447719762080" target="_blank" class="text-xl font-bold hover:text-green-500 transition">+44 7719 762080</a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 rounded-xl glass flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-yellow-500 text-2xl"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 uppercase tracking-widest mb-1">Location</div>
+                            <div class="text-xl font-bold">United Kingdom (Remote)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass p-8 rounded-2xl">
+                    <h4 class="text-xl font-bold mb-4">Availability</h4>
+                    <p class="text-gray-400 mb-6">I'm currently available for new projects and consultations. Typical response time is within 24 hours.</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-green-500 font-bold">Available for new projects</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass p-10 rounded-2xl">
+                <h3 class="text-3xl font-bold mb-8 section-title">Project Inquiry</h3>
+                
+                <!-- FORMSPREE FORM - Using your actual Formspree URL -->
+                <form id="contact-form" action="https://formspree.io/f/xpqavnvl" method="POST" class="space-y-6">
+                    <!-- Hidden fields for better form handling -->
+                    <input type="hidden" name="_subject" value="New Portfolio Inquiry - yevinbollegala.com">
+                    <input type="text" name="_gotcha" style="display:none"> <!-- Honeypot spam filter -->
+                    
+                    <div>
+                        <label for="name" class="block text-sm font-bold mb-2">Your Name *</label>
+                        <input type="text" id="name" name="name" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition" required>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-bold mb-2">Email Address *</label>
+                        <input type="email" id="email" name="email" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition" required>
+                    </div>
+                    
+                    <div>
+                        <label for="project-type" class="block text-sm font-bold mb-2">Project Type *</label>
+                        <select id="project-type" name="project-type" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition" required>
+                            <option value="" disabled selected>Select project type</option>
+                            <option value="AI Chatbot Development">AI Chatbot Development</option>
+                            <option value="Web Application">Web Application</option>
+                            <option value="E-Commerce Store">E-Commerce Store</option>
+                            <option value="Business Website">Business Website</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="budget" class="block text-sm font-bold mb-2">Budget Range</label>
+                        <select id="budget" name="budget" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition">
+                            <option value="" selected>Select budget range</option>
+                            <option value="£500 - £1,000">£500 - £1,000</option>
+                            <option value="£1,000 - £3,000">£1,000 - £3,000</option>
+                            <option value="£3,000 - £5,000">£3,000 - £5,000</option>
+                            <option value="£5,000+">£5,000+</option>
+                            <option value="To be discussed">To be discussed</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="message" class="block text-sm font-bold mb-2">Project Details *</label>
+                        <textarea id="message" name="message" rows="5" class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 transition" placeholder="Please describe your project requirements, timeline, and any specific features needed..." required></textarea>
+                    </div>
+                    
+                    <!-- Success/Error Messages -->
+                    <div id="form-success" class="form-success" style="display: none;">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                            <div>
+                                <h4 class="font-bold">Message Sent Successfully!</h4>
+                                <p class="text-sm text-gray-400">Thank you for your inquiry. I'll get back to you within 24 hours.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="form-error" class="form-error" style="display: none;">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                            <div>
+                                <h4 class="font-bold">Oops! Something went wrong.</h4>
+                                <p class="text-sm text-gray-400">Please try again or email me directly at yevin.bollegala@gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold py-4 rounded-lg hover:shadow-xl hover:shadow-yellow-500/20 transition-all duration-300" id="submit-btn">
+                        Send Message
+                    </button>
+                    
+                    <p class="text-xs text-gray-500 text-center mt-4">
+                        I typically respond within 24 hours. For urgent inquiries, please WhatsApp me.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/447719762080" target="_blank" class="fixed bottom-8 right-8 z-[100] w-16 h-16 bg-[#25D366] rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(37,211,102,0.4)] hover:scale-110 transition-transform cursor-pointer floating">
+        <i class="fab fa-whatsapp text-white text-3xl"></i>
+    </a>
+
+    <script>
+        // Page Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-yellow-500');
+            });
+            
+            // Close mobile menu if open
+            closeMobileMenu();
+        }
+        
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenuBtn = document.getElementById('close-mobile-menu');
+        
+        function openMobileMenu() {
+            mobileMenu.style.height = '100vh';
+        }
+        
+        function closeMobileMenu() {
+            mobileMenu.style.height = '0';
+        }
+        
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+        closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+        
+        // Close mobile menu when clicking outside
+        mobileMenu.addEventListener('click', function(e) {
+            if (e.target.id === 'mobile-menu') {
+                closeMobileMenu();
+            }
+        });
+        
+        // Project Data
+        const projects = [
+            { id: 1, title: "Neural Chat Interface", desc: "Enterprise-grade ChatGPT integration with custom training and natural language understanding", tech: "AI", category: "ai" },
+            { id: 2, title: "Vue.js E-Commerce Platform", desc: "Full-featured online store with inventory management and payment processing", tech: "Vue.js", category: "ecommerce" },
+            { id: 3, title: "AI Tutoring System", desc: "Intelligent learning platform with personalized lesson plans and progress tracking", tech: "AI", category: "education" },
+            { id: 4, title: "Real Impact Marketing Website", desc: "High-conversion agency site with lead generation and analytics dashboard", tech: "Web", category: "business" },
+            { id: 5, title: "Secure API Gateway", desc: "Hardened infrastructure with OAuth2 authentication and rate limiting", tech: "Backend", category: "web" },
+            { id: 6, title: "Automation Engine", desc: "Business process automation with trigger-based notifications", tech: "Backend", category: "business" },
+            { id: 7, title: "Essence Lux Perfume Store", desc: "Premium e-commerce with advanced filtering and customer experience", tech: "Vue.js", category: "ecommerce" },
+            { id: 8, title: "Alhidaayah Quran Academy", desc: "Complete LMS with student portal and interactive lessons", tech: "Web", category: "education" },
+            { id: 9, title: "Customer Support Chatbot", desc: "24/7 AI assistant with ticket creation and escalation logic", tech: "AI", category: "ai" },
+            { id: 10, title: "Portfolio Management System", desc: "Financial tracking dashboard with real-time data visualization", tech: "Web", category: "business" }
+        ];
+        
+        let displayedProjects = 6;
+        
+        // Render Projects
+        function renderProjects(filter = 'all') {
+            const projectList = document.getElementById('project-list');
+            projectList.innerHTML = '';
+            
+            const filteredProjects = filter === 'all' 
+                ? projects.slice(0, displayedProjects) 
+                : projects.filter(p => p.category === filter).slice(0, displayedProjects);
+            
+            filteredProjects.forEach(project => {
+                const categoryColors = {
+                    'ai': 'from-purple-500/20 to-pink-500/20',
+                    'web': 'from-blue-500/20 to-cyan-500/20',
+                    'ecommerce': 'from-green-500/20 to-emerald-500/20',
+                    'education': 'from-orange-500/20 to-yellow-500/20',
+                    'business': 'from-indigo-500/20 to-purple-500/20'
+                };
+                
+                projectList.innerHTML += `
+                    <div class="project-card glass p-8 rounded-2xl" data-category="${project.category}">
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="w-12 h-12 rounded-xl ${categoryColors[project.category]} flex items-center justify-center border border-white/10">
+                                <i class="fas fa-terminal text-xs text-yellow-500"></i>
+                            </div>
+                            <span class="text-[10px] font-mono text-gray-700 uppercase tracking-widest">Project ${project.id.toString().padStart(2, '0')}</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 tracking-tight">${project.title}</h3>
+                        <p class="text-sm text-gray-500 mb-6 leading-relaxed">${project.desc}</p>
+                        <div class="pt-6 border-t border-white/5 flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-widest text-yellow-500/80">${project.tech}</span>
+                            <i class="fas fa-chevron-right text-xs text-gray-800"></i>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load More Projects
+        function loadMoreProjects() {
+            displayedProjects += 3;
+            const activeFilter = document.querySelector('.cat-btn.active').dataset.filter;
+            renderProjects(activeFilter);
+            
+            if (displayedProjects >= projects.length) {
+                document.querySelector('button[onclick="loadMoreProjects()"]').style.display = 'none';
+            }
+        }
+        
+        // Initialize Projects
+        renderProjects();
+        
+        // Category Filtering
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                displayedProjects = 6;
+                renderProjects(this.dataset.filter);
+                
+                // Show/hide load more button based on filtered results
+                const filteredProjects = this.dataset.filter === 'all' 
+                    ? projects 
+                    : projects.filter(p => p.category === this.dataset.filter);
+                    
+                if (filteredProjects.length <= 6) {
+                    document.querySelector('button[onclick="loadMoreProjects()"]').style.display = 'none';
+                } else {
+                    document.querySelector('button[onclick="loadMoreProjects()"]').style.display = 'inline-block';
+                }
+            });
+        });
+        
+        // Formspree Form Submission Handling - SIMPLIFIED
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+            
+            // Show loading state
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            // Hide previous messages
+            document.getElementById('form-success').style.display = 'none';
+            document.getElementById('form-error').style.display = 'none';
+            
+            // Form will submit normally to Formspree
+            // Formspree will redirect back to this page with success/error parameters
+            
+            // Reset button after 5 seconds (in case form doesn't redirect)
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }, 5000);
+        });
+        
+        // Check URL for Formspree success/error messages
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('success')) {
+                // Show success message
+                document.getElementById('form-success').style.display = 'block';
+                document.getElementById('contact-form').reset();
+                
+                // Scroll to form
+                document.getElementById('contact-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Remove success parameter from URL
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+            
+            if (urlParams.has('error')) {
+                // Show error message
+                document.getElementById('form-error').style.display = 'block';
+                
+                // Scroll to form
+                document.getElementById('contact-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Remove error parameter from URL
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        });
+        
+        // 3D Background Animation
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas: document.getElementById('bg-canvas'), 
+            alpha: true, 
+            antialias: true,
+            powerPreference: "high-performance"
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        // Create particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorArray = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i += 3) {
+            // Position
+            posArray[i] = (Math.random() - 0.5) * 25;
+            posArray[i + 1] = (Math.random() - 0.5) * 25;
+            posArray[i + 2] = (Math.random() - 0.5) * 25;
+            
+            // Color (yellow to blue gradient)
+            colorArray[i] = Math.random() * 0.5 + 0.5; // R: 0.5-1.0
+            colorArray[i + 1] = Math.random() * 0.3 + 0.7; // G: 0.7-1.0
+            colorArray[i + 2] = Math.random() * 0.2; // B: 0.0-0.2
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        camera.position.z = 10;
+        
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            particlesMesh.rotation.x += 0.0002;
+            particlesMesh.rotation.y += 0.0003;
+            particlesMesh.rotation.z += 0.0001;
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
